@@ -27,13 +27,17 @@ class Postgresql(BaseEngine):
     def get_connection(self):
         if self.connection is None:
             import psycopg2
-            self.connection = psycopg2.connect(
-                database=self.config.get('name'),
-                user=self.config.get('user'),
-                host=self.config.get('host'),
-                password=self.config.get('password'),
-                port=self.config.get('port'),
-            )
+
+            settings = {
+                'database': self.config.get('name'),
+                'user': self.config.get('user'),
+                'host': self.config.get('host'),
+                'port': self.config.get('port'),
+            }
+            if self.config.get('password'):
+                settings['password'] = self.config.get('password')
+
+            self.connection = psycopg2.connect(**settings)
         return self.connection
 
     def create_migrations_table(self):
@@ -79,7 +83,7 @@ class Postgresql(BaseEngine):
                     psycopg2.OperationalError,
                     psycopg2.ProgrammingError) as e:
                 connection.rollback()
-                print(e.message)
+                print(e.args[0])
                 from sqlibrist.helpers import ApplyMigrationFailed
 
                 raise ApplyMigrationFailed
@@ -100,7 +104,7 @@ class Postgresql(BaseEngine):
                     psycopg2.OperationalError,
                     psycopg2.ProgrammingError) as e:
                 connection.rollback()
-                print(e.message)
+                print(e.args[0])
                 from sqlibrist.helpers import ApplyMigrationFailed
 
                 raise ApplyMigrationFailed

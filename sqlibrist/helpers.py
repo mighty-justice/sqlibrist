@@ -240,11 +240,11 @@ def mark_affected_items(schema, name):
 def handle_exception(e):
     if isinstance(e, CircularDependencyException):
         print('Circular dependency:')
-        print('  %s' % ' >\n  '.join(e.message))
+        print('  %s' % ' >\n  '.join(e.args[0]))
     elif isinstance(e, UnknownDependencyException):
-        print('Unknown dependency %s at %s' % e.message)
+        print('Unknown dependency %s at %s' % e.args[0])
     elif isinstance(e, (BadConfig, MigrationIrreversible)):
-        print(e.message)
+        print(e.args[0])
 
 
 def get_command_parser(parser=None):

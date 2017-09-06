@@ -4,11 +4,11 @@ from __future__ import absolute_import
 import os
 from contextlib import contextmanager
 
+from django.conf import settings
 from django.core.management import BaseCommand
 from django.db import connection
 
 from django_sqlibrist.helpers import get_config, Args
-from django_sqlibrist.settings import SQLIBRIST_DIRECTORY
 from sqlibrist.helpers import get_command_parser, SqlibristException, \
     handle_exception
 
@@ -28,7 +28,7 @@ class Command(BaseCommand):
     def handle(self, *args, **options):
         config = get_config()
 
-        with chdir(SQLIBRIST_DIRECTORY):
+        with chdir(settings.SQLIBRIST_DIRECTORY):
             try:
                 options['func'](Args(options), config, connection)
             except SqlibristException as e:
