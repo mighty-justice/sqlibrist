@@ -41,36 +41,36 @@ class Postgresql(BaseEngine):
         return self.connection
 
     def create_migrations_table(self):
-        connection = self.get_connection()
-        print('Creating schema and migrations log table...\n')
-        with connection.cursor() as cursor:
-            cursor.execute('CREATE SCHEMA IF NOT EXISTS sqlibrist;')
+        with self.get_connection() as connection:
+            print('Creating schema and migrations log table...\n')
+            with connection.cursor() as cursor:
+                cursor.execute('CREATE SCHEMA IF NOT EXISTS sqlibrist;')
 
-            cursor.execute('''
-            CREATE TABLE IF NOT EXISTS sqlibrist.migrations (
-            id SERIAL PRIMARY KEY,
-            migration TEXT,
-            datetime TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP
-            );
-            ''')
+                cursor.execute('''
+                CREATE TABLE IF NOT EXISTS sqlibrist.migrations (
+                id SERIAL PRIMARY KEY,
+                migration TEXT,
+                datetime TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP
+                );
+                ''')
 
     def get_applied_migrations(self):
-        connection = self.get_connection()
-        with connection.cursor() as cursor:
-            cursor.execute('''
-            SELECT migration FROM sqlibrist.migrations
-            ORDER BY datetime; ''')
-            return cursor.fetchall()
+        with self.get_connection() as connection:
+            with connection.cursor() as cursor:
+                cursor.execute('''
+                SELECT migration FROM sqlibrist.migrations
+                ORDER BY datetime; ''')
+                return cursor.fetchall()
 
     def get_last_applied_migration(self):
-        connection = self.get_connection()
-        with connection.cursor() as cursor:
-            cursor.execute('''
-            SELECT migration FROM sqlibrist.migrations
-            ORDER BY datetime DESC
-            LIMIT 1; ''')
-            result = cursor.fetchone()
-            return result and result[0] or None
+        with self.get_connection() as connection:
+            with connection.cursor() as cursor:
+                cursor.execute('''
+                SELECT migration FROM sqlibrist.migrations
+                ORDER BY datetime DESC
+                LIMIT 1; ''')
+                result = cursor.fetchone()
+                return result and result[0] or None
 
     def apply_migration(self, name, statements, fake=False):
         import psycopg2
