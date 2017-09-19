@@ -4,8 +4,7 @@ from __future__ import print_function
 import glob
 import os
 
-from sqlibrist.helpers import get_engine, ApplyMigrationFailed, \
-    MigrationIrreversible
+from sqlibrist.helpers import get_engine, MigrationIrreversible
 
 
 def unapplied_migrations(migration_list, applied_migrations):
@@ -43,12 +42,10 @@ def migrate(args, config, connection=None):
         print('Un-Applying migration %s... ' % last_applied_migration, end='')
         if fake:
             print('(fake run) ', end='')
-        try:
-            engine.unapply_migration(last_applied_migration, down, fake)
-        except ApplyMigrationFailed:
-            print('Error, rolled back')
-        else:
-            print('done')
+
+        engine.unapply_migration(last_applied_migration, down, fake)
+
+        print('done')
         return
 
     elif not revert:
@@ -67,13 +64,10 @@ def migrate(args, config, connection=None):
         print('Applying migration %s... ' % migration_name, end='')
         if fake:
             print('(fake run) ', end='')
-        try:
-            engine.apply_migration(migration_name, up, fake)
-        except ApplyMigrationFailed:
-            print('Error, rolled back')
-            break
-        else:
-            print('done')
-        if till_migration_name \
-                and migration_name == till_migration_name:
+
+        engine.apply_migration(migration_name, up, fake)
+
+        print('done')
+
+        if till_migration_name and migration_name == till_migration_name:
             break

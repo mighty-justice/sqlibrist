@@ -245,6 +245,8 @@ def handle_exception(e):
         print('Unknown dependency %s at %s' % e.args[0])
     elif isinstance(e, (BadConfig, MigrationIrreversible)):
         print(e.args[0])
+    elif isinstance(e, ApplyMigrationFailed):
+        print('Error, rolled back')
 
 
 def get_command_parser(parser=None):
